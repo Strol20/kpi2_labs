@@ -29,3 +29,11 @@
 **Результат**
 
 Було створено forum-photographer.feature
+
+**Промт**
+
+Побудуй use-case-діаграму на PlantUMLв окремому файлі, використовуючи spec.md ears.md forum-photographers.feature
+
+**Результат**
+
+Було створено forum-photographer.feature
