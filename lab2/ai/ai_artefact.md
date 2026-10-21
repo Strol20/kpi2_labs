@@ -21,3 +21,11 @@
 **Результат**
 
 Було створено user-stories.md
+
+**Промт**
+
+Створи Gherkin-сценарії використовуючи README.md, spec.md, user-stories.md
+
+**Результат**
+
+Було створено forum-photographer.feature
