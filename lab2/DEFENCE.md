@@ -38,5 +38,5 @@
 
 ## Здача
 
-- GitHub PR: не створювався в межах цієї роботи.
+- GitHub PR: https://github.com/Strol20/kpi2_labs/pull/2
 - Заповнений захист: цей файл.
