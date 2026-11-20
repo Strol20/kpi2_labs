@@ -5,27 +5,29 @@ sequenceDiagram
     actor User as Користувач
     participant UI as ForumUI
     participant PostService as PostService
+    participant TopicRepository as TopicRepository
     participant PostRepository as PostRepository
     participant PhotoRepository as PhotoRepository
 
-    User->>UI: openPost("Захід сонця")
+    User->>UI: openPostInTopic("Захід сонця")
     activate UI
-    UI->>PostService: getPost(postId)
+    UI->>PostService: getPublishedPostByTopicTitle(title)
     activate PostService
-    PostService->>PostRepository: findPostById(postId)
+    PostService->>TopicRepository: findTopicByTitle(title)
+    activate TopicRepository
+    TopicRepository-->>PostService: topicFound(topic_id)
+    deactivate TopicRepository
+    PostService->>PostRepository: findPublishedPostByTopicId(topic_id)
     activate PostRepository
-    PostRepository-->>PostService: postFound(post)
+    PostRepository-->>PostService: postFound(post, post_id)
     deactivate PostRepository
     alt Допис знайдено та опубліковано
-        PostService->>PhotoRepository: findPhotosByPostId(postId)
+        PostService->>PhotoRepository: findPhotosByPostId(post_id)
         activate PhotoRepository
         PhotoRepository-->>PostService: photosList
         deactivate PhotoRepository
-        loop Для кожної фотографії допису
-            PostService->>PostService: mapPhotoMetadata(photo)
-        end
         PostService-->>UI: postDetails(post, photosList)
-    else Допис не знайдено або не опубліковано
+    else Розширення моделі: допис не знайдено або не опубліковано
         PostService-->>UI: postUnavailable()
     end
     deactivate PostService

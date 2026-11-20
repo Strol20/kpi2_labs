@@ -5,41 +5,45 @@ sequenceDiagram
     autonumber
     actor User as Користувач
     participant UI as ForumUI
-    participant SearchService as PostSearchService
+    participant TagService as TagService
+    participant PostService as PostService
     participant TagRepository as TagRepository
-    participant PostTagRepository as PostTagRepository
     participant PostRepository as PostRepository
 
     User->>UI: enterTag("пейзаж")
     User->>UI: searchPostsByTag()
     activate UI
-    UI->>SearchService: findPostsByTag("пейзаж")
-    activate SearchService
-    SearchService->>TagRepository: findTagByName("пейзаж")
+    UI->>TagService: findPostsByTag(name)
+    activate TagService
+    TagService->>TagRepository: findTagByName(name)
     activate TagRepository
-    TagRepository-->>SearchService: tagLookupResult(tag)
+    TagRepository-->>TagService: tagLookupResult(tag_id)
     deactivate TagRepository
     alt Тег знайдено
-        SearchService->>PostTagRepository: findPostIdsByTagId(tagId)
-        activate PostTagRepository
-        PostTagRepository-->>SearchService: postIds
-        deactivate PostTagRepository
-        SearchService->>PostRepository: findPublishedPostsByIds(postIds)
+        TagService->>PostService: findPublishedPostsByTag(tag_id)
+        activate PostService
+        PostService->>TagRepository: findPostIdsByTagId(tag_id)
+        activate TagRepository
+        TagRepository-->>PostService: post_ids
+        deactivate TagRepository
+        PostService->>PostRepository: findPublishedPostsByIds(post_ids)
         activate PostRepository
-        PostRepository-->>SearchService: matchingPosts
+        PostRepository-->>PostService: matchingPosts
         deactivate PostRepository
         alt Знайдено дописи
             loop Для кожного знайденого допису
-                SearchService->>SearchService: addPostToResults(post)
+                PostService->>PostService: addPostToResults(post)
             end
-            SearchService-->>UI: searchResults(matchingPosts)
-        else Дописів із цим тегом немає
-            SearchService-->>UI: emptySearchResults()
+            PostService-->>TagService: searchResults(matchingPosts)
+        else Розширення моделі: дописів із цим тегом немає
+            PostService-->>TagService: searchResults([])
         end
-    else Тег не знайдено
-        SearchService-->>UI: emptySearchResults()
+        deactivate PostService
+        TagService-->>UI: searchResults(results)
+    else Розширення моделі: тег не знайдено
+        TagService-->>UI: emptySearchResults()
     end
-    deactivate SearchService
+    deactivate TagService
     UI-->>User: displaySearchResults()
     deactivate UI
 ```

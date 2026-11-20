@@ -5,44 +5,54 @@ sequenceDiagram
     actor Photographer as Фотограф
     participant UI as ForumUI
     participant PostService as PostService
-    participant ImageStorage as ImageStorageService
+    participant PhotoStorage as PhotoStorageService
+    participant TopicRepository as TopicRepository
     participant PostRepository as PostRepository
     participant PhotoRepository as PhotoRepository
 
-    Photographer->>UI: createPost("Захід сонця")
+    Photographer->>UI: createTopicAndPost("Захід сонця")
     Photographer->>UI: attachPhotos(["sunset-1.jpg", "sunset-2.jpg"])
     Photographer->>UI: submitPost()
     activate UI
-    UI->>PostService: publishPost(postData, photos)
+    UI->>PostService: publishPost(topicData, postData, photos)
     activate PostService
     PostService->>PostService: validatePost()
-    PostService->>PostRepository: savePost(postData)
+    PostService->>TopicRepository: saveTopic(title, content, author_id)
+    activate TopicRepository
+    TopicRepository-->>PostService: topicSaved(topic_id)
+    deactivate TopicRepository
+    PostService->>PostRepository: savePost(topic_id, author_id, text, status="draft")
     activate PostRepository
-    PostRepository-->>PostService: postSaved(postId)
+    PostRepository-->>PostService: postSaved(post_id)
     deactivate PostRepository
 
     loop Для кожної прикріпленої фотографії
-        PostService->>ImageStorage: uploadPhoto(photoFile)
-        activate ImageStorage
+        PostService->>PhotoStorage: uploadPhoto(photo_file)
+        activate PhotoStorage
         alt Фотографію збережено
-            ImageStorage-->>PostService: returnImageUrl(imageUrl)
-        else Помилка збереження фотографії
-            ImageStorage-->>PostService: uploadFailed(error)
-        end
-        deactivate ImageStorage
-        opt Отримано imageUrl
-            PostService->>PhotoRepository: savePhoto(postId, imageUrl, uploaderId)
+            PhotoStorage-->>PostService: returnImageUrl(image_url)
+            PostService->>PhotoRepository: savePhoto(post_id, image_url, uploader_id)
             activate PhotoRepository
-            PhotoRepository-->>PostService: photoSaved(photoId)
+            PhotoRepository-->>PostService: photoSaved(photo_id)
             deactivate PhotoRepository
+        else Помилка збереження фотографії
+            PhotoStorage-->>PostService: uploadFailed(error)
+            PostService->>PostService: recordUploadFailure(error)
         end
+        deactivate PhotoStorage
     end
-    PostService->>PostRepository: markPostPublished(postId)
-    activate PostRepository
-    PostRepository-->>PostService: postPublished()
-    deactivate PostRepository
-    PostService-->>UI: publicationResult(postId)
+    alt Усі фотографії збережено
+        PostService->>PostRepository: markPostPublished(post_id)
+        activate PostRepository
+        PostRepository-->>PostService: postPublished()
+        deactivate PostRepository
+        PostService-->>UI: publicationSucceeded(post_id)
+        UI-->>Photographer: showPostWithPhotos(post_id)
+    else Помилка збереження хоча б однієї фотографії
+        Note over PostService,PostRepository: Допис залишається зі status="draft"
+        PostService-->>UI: publicationFailed(post_id, error)
+        UI-->>Photographer: showPublicationFailure()
+    end
     deactivate PostService
-    UI-->>Photographer: showPostWithPhotos(postId)
     deactivate UI
 ```
