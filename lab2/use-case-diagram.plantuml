@@ -1,0 +1,52 @@
+@startuml
+left to right direction
+
+actor "Фотограф / користувач" as User
+actor "Сервіс зберігання\nзображень" as ImageService
+
+rectangle "Форум фотографів" {
+  usecase "Опублікувати допис" as PublishPost
+  usecase "Додати фотографії\nдо допису" as AttachPhotos
+  usecase "Зберегти фотографії" as StorePhotos
+  usecase "Додати теги\nдо допису" as AddTags
+  usecase "Переглянути допис" as ViewPost
+  usecase "Переглянути прикріплені\nфотографії" as ViewPhotos
+  usecase "Додати коментар\nдо допису" as AddComment
+  usecase "Переглянути коментарі" as ViewComments
+  usecase "Знайти дописи\nза тегом" as SearchByTag
+}
+
+User -- PublishPost
+User -- AttachPhotos
+User -- AddTags
+User -- ViewPost
+User -- ViewPhotos
+User -- AddComment
+User -- ViewComments
+User -- SearchByTag
+
+ImageService -- StorePhotos
+
+AttachPhotos ..> StorePhotos : <<include>>
+AttachPhotos ..> PublishPost : <<extend>>
+AddTags ..> PublishPost : <<extend>>
+ViewPhotos ..> ViewPost : <<extend>>
+
+note right of PublishPost
+  FR-1, US-1
+end note
+note right of AttachPhotos
+  FR-2, FR-3, FR-4
+  US-2, US-3
+end note
+note right of AddComment
+  FR-5, US-4
+end note
+note right of AddTags
+  FR-6, US-5
+end note
+note right of SearchByTag
+  FR-6, US-6
+end note
+
+@enduml
