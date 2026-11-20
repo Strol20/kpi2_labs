@@ -20,6 +20,7 @@ erDiagram
         uuid topic_id FK
         uuid author_id FK
         string text
+        string status
         datetime created_at
     }
     
@@ -38,11 +39,21 @@ erDiagram
         string name
     }
 
+    COMMENT {
+        uuid id PK
+        uuid post_id FK
+        uuid author_id FK
+        string text
+        datetime created_at
+    }
+
     %% Опис зв'язків
     USER ||--o{ TOPIC : "створює"
     USER ||--o{ POST : "пише"
     USER ||--o{ PHOTO : "завантажує"
+    USER ||--o{ COMMENT : "пише"
     TOPIC ||--o{ POST : "містить"
     POST ||--o{ PHOTO : "має прикріплені"
-    PHOTO }|--|{ TAG : "позначена"
+    POST }|--|{ TAG : "позначений"
+    POST ||--o{ COMMENT : "має"
 ```
