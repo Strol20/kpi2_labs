@@ -15,3 +15,11 @@
 
 **Результат ШІ:**
 *ШІ згенерував файл `sequence-diagram-discrepancies.md`*
+
+**Промпт**
+
+> Виправи всі розбіжності з файлу discrepancies та відчитайся в DEFENCE.md
+
+**Результат ШІ:**
+
+Виправи всі розбіжності з файлу discrepancies та відчитайся в DEFENCE.md
