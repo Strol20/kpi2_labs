@@ -38,5 +38,5 @@ DEFENSE - Завдання
 - Кроки кожної діаграми вручну зіставлено з відповідним Gherkin-сценарієм і UC у `spec3.md`, а імена даних у повідомленнях доступу — зі `spec1.md` і `diagram/diagram.md`. А знайдені розбіжності були виправлені за допомогою ші.
 
 Здача: 
-(а) посилання на GitHub PR: https://github.com/Strol20/kpi2_labs
+(а) посилання на GitHub PR: https://github.com/Strol20/kpi2_labs/pull/3/
 (б) цей заповнений DEFENSE.
